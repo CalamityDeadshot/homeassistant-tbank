@@ -6,10 +6,13 @@ import logging
 import requests
 from selenium import webdriver
 from selenium.common import TimeoutException
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+from homeassistant.exceptions import HomeAssistantError
 
 logger = logging.getLogger("tbank")
 
@@ -30,16 +33,15 @@ class Client():
         self.driver_options = driver_options
         self.driver: webdriver.Remote | None = None
 
-    def testConnection(self) -> bool:
+    def testConnection(self):
         try:
             logger.info("Testing Selenium connection")
             self.getDriver().get(self.BASE_URL)
         except Exception as e:
             logger.error(f"Selenium connection failed: {e}")
-            return False
+            raise SeleniumUnavailable from e
         else:
             logger.info("Selenium connection established")
-            return True
         finally:
             self.cleanup()
 
@@ -53,22 +55,32 @@ class Client():
         else:
             logger.info("Selenium connection established")
 
-    def test_access(self) -> bool:
+    def test_access(self):
         try:
+            self.getDriver().get(f"{self.BASE_URL}/login")
             self.waitFor(self.getDriver(), "//a[@href='/new-product/']")
-        except TimeoutException:
-            return False
-        else:
-            return True
+        except TimeoutException as err:
+            raise AuthFailed from err
         finally:
             self.cleanup()
 
     def getDriver(self):
         if self.driver is None:
-            self.driver = webdriver.Remote(
-                command_executor=self.selenium_url,
-                options=self.driver_options
-            )
+            try:
+                self.driver = webdriver.Remote(
+                    command_executor=self.selenium_url,
+                    options=self.driver_options
+                )
+            except Exception as err:
+                raise SeleniumUnavailable from err
+        else:
+            try:
+                self.driver.title
+            except WebDriverException:
+                self.driver = self.driver = webdriver.Remote(
+                    command_executor=self.selenium_url,
+                    options=self.driver_options
+                )
         return self.driver
 
     def cleanup(self):
@@ -168,7 +180,7 @@ class Client():
 
         response = accounts.json()
         if response["resultCode"] == "INSUFFICIENT_PRIVILEGES":
-            raise SessionError()
+            raise SessionError
 
         def accountMapping(account):
             return {
@@ -263,4 +275,11 @@ class Client():
         real_positions = filter(lambda p: p["securityType"] != "virtual_stock", response["portfolios"][0]["positions"])
         return list(map(positionMapping, real_positions))
 
-class SessionError(Exception): ...
+class SessionError(HomeAssistantError):
+    """Could not obtain a viable T-Bank session."""
+
+class SeleniumUnavailable(HomeAssistantError):
+    """Selenium Grid is unavailable."""
+
+class AuthFailed(HomeAssistantError):
+    """T-Bank auth step failed."""
