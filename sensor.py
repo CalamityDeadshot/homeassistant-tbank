@@ -1,13 +1,7 @@
-import logging
 from typing import Any
 
-from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorEntity,
-    SensorStateClass,
-)
+from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTemperature
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -31,7 +25,7 @@ async def async_setup_entry(
     )
 
 class MoneySensor(CoordinatorEntity[TBankUpdateCoordinator], SensorEntity):
-    """Implementation of a sensor."""
+    """Implementation of a money sensor."""
 
     data: dict[str, Any]
 
@@ -78,6 +72,10 @@ class MoneySensor(CoordinatorEntity[TBankUpdateCoordinator], SensorEntity):
     def name(self) -> str:
         """Return the name of the sensor."""
         return self.data['attributes']['friendly_name']
+
+    @property
+    def icon(self) -> str:
+        return f"mdi:currency-{self.data["attributes"]["currency"].lower()}"
 
     @property
     def native_value(self) -> int | float:

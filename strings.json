@@ -1,15 +1,13 @@
 {
   "config": {
-    "title": "T-Bank Config Flow Example",
     "abort": {
       "already_configured": "Device is already configured",
       "reconfigure_successful": "Reconfiguration successful",
       "already_in_progress": "A setup is already in progress for this integration"
     },
     "error": {
-      "cannot_connect": "Failed to connect",
-      "invalid_auth": "Invalid authentication",
-      "invalid_settings": "Invalid settings",
+      "selenium_unavailable": "Cannot reach Selenium instance and/or create a session. Make sure it is running and reachable.",
+      "auth_failed": "Failed to confirm authentication. Make sure that your browser session is opened on the main page of your bank account and try again.",
       "unknown": "Unexpected error"
     },
     "step": {
@@ -22,47 +20,16 @@
         "data_description": {
             "selenium_url": "URL to your Selenium Grid instance.",
             "user_prefix": "Generated entities will be prefixed with this string - useful for multiple users. If left blank or \"root\", no prefix will be added."
+        },
+        "error": {
+          "selenium_unavailable": "Cannot reach Selenium instance and/or create a session. Make sure it is running and reachable.",
+          "auth_failed": "Failed to confirm authentication. Make sure that your browser session is opened on the main page of your bank account and try again.",
+          "unknown": "Unexpected error"
         }
       },
       "authentication": {
         "title": "Authenticate on your Selenium instance",
         "description": "A session is now open on the Selenium instance you provided with T-Bank main page open. Navigate to it (with NoVNC, for example) and authenticate manually into your bank account. When prompted with quick access code, duplicate it into the field below. The step will be finished when your bank account fully loads.\nTo avoid stray sessions, it will be closed in 5 minutes."
-      }
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Example2 Options",
-        "description": "Select which options to amend.",
-        "menu_options": {
-          "option1": "Options Set 1",
-          "option2": "Options Set 2"
-        }
-      },
-      "option1": {
-        "title": "Example2 Options",
-        "description": "Option Set 1",
-        "data": {
-          "scan_interval": "Scan Interval (seconds)",
-          "description": "My Description"
-        }
-      },
-      "option2": {
-        "title": "Example2 Options",
-        "description": "Option Set 2",
-        "data": {
-          "chose": "Pick a device"
-        }
-      }
-    }
-  },
-  "selector": {
-    "example_selector": {
-      "options": {
-        "all": "All",
-        "light": "Light",
-        "switch": "Switch"
       }
     }
   }
