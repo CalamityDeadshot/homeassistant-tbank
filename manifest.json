@@ -1,0 +1,15 @@
+{
+    "domain": "tbank",
+    "name": "T-Bank",
+    "version": "0.0.1",
+    "integration_type": "device",
+    "config_flow": true,
+    "single_config_entry": false,
+    "iot_class": "cloud_polling",
+    "codeowners": [
+        "CalamityDeadshot"
+    ],
+    "dependencies": [],
+    "requirements": [],
+    "loggers": ["tbank"]
+}
